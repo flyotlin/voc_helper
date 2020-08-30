@@ -2,21 +2,23 @@ import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export interface Props {
+type cardProps = {
   vocabulary: String;
   definition: String;
 };
 
-export function Card(props: Props) {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.voc}>{props.vocabulary}</Text>
-      <Text style={styles.def}>{props.definition}</Text>
-    </View>
-  );
-}
+const Card = (props: cardProps) => (
+  <View style={styles.card}>
+    <Text style={styles.voc}>{props.vocabulary}</Text>
+    <Text style={styles.def}>{props.definition}</Text>
+  </View>
+);
 
-const words = [["と思います", "猜想、覺得、認為"], ["覚える", "察覺"], ["Simulate", "模擬"]];
+const words = [
+  ["と思います", "猜想、覺得、認為"], 
+  ["覚える", "察覺"], 
+  ["シミュレーション", "模擬"]
+];
 
 export default function App() {
   let cards = words.map( (word) => {
