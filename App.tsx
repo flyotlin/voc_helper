@@ -1,63 +1,76 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, TouchableWithoutFeedback } from 'react-native';
+import { Provider as PaperProvider, Appbar, Menu, Button } from 'react-native-paper';
+import styles from './styles/mainStyle';
+import testVocImport from './voc/testVoc.json';
+import EnglishVocImport from './voc/EnglishVoc.json';
 
-type cardProps = {
-  vocabulary: String;
-  definition: String;
+const testVoc = testVocImport;
+const EnglishVoc = EnglishVocImport;
+
+interface wordsInterface {
+  words: string[][];
 };
 
-const Card = (props: cardProps) => (
-  <View style={styles.card}>
-    <Text style={styles.voc}>{props.vocabulary}</Text>
-    <Text style={styles.def}>{props.definition}</Text>
-  </View>
-);
+function Card(props: wordsInterface) {
+  const [num, setNum] = React.useState(0);
 
-const words = [
-  ["と思います", "猜想、覺得、認為"], 
-  ["覚える", "察覺"], 
-  ["シミュレーション", "模擬"]
-];
-
-export default function App() {
-  let cards = words.map( (word) => {
-    return (
-      <Card 
-        key={word[0].toString()}
-        vocabulary={word[0]}
-        definition={word[1]}
-      />
-    );
-  });
+  function handleClick() {
+    const newNum = (num + 1) % props.words.length;
+    setNum(newNum);
+  }
 
   return (
-    <View style={styles.container}>
-      {cards}
-      <StatusBar style="auto" />
-    </View>
+    <TouchableWithoutFeedback
+      onPress={handleClick} >
+      <View style={styles.card}>
+        <Text style={styles.voc}>{props.words[num][0]}</Text>
+        <Text style={styles.def}>{props.words[num][1]}</Text>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
-    borderColor: 'black',
-    borderWidth: 3,
-  },
-  voc: {
-    fontSize: 35,
-    fontWeight: "700",
-    textAlign: "center",
-  }, 
-  def: {
-    fontSize: 20,
-    fontWeight: "normal",
-    textAlign: "center",
-  },
-});
+export default function App() {
+  const [words, setWords] = React.useState(testVoc);
+  const [visible, setVisible] = React.useState(false);
+
+  function changeVoc(prop :string[][]) {
+    setWords(prop);
+    setVisible(false);
+  }
+
+  function openMenu() {
+    setVisible(true);
+  }
+
+  function closeMenu() {
+    setVisible(false);
+  }
+
+  return (
+    <PaperProvider>
+      <Appbar.Header>
+        <Appbar.Content title="VOC HELPER" />
+        <Menu
+          style={{paddingTop: 50}}
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={<Appbar.Action icon="file-plus-outline" onPress={openMenu} />}
+        >
+          <Menu.Item onPress={() => {changeVoc(testVoc)}} title="testVoc" />
+          <Menu.Item onPress={() => {changeVoc(EnglishVoc)}} title="EnglishVoc" />
+        </Menu>
+
+      </Appbar.Header>
+      <View style={styles.container}>
+        <Card words={words} />
+        <StatusBar style="auto" />
+      </View>
+    </PaperProvider>
+    
+
+  );
+}
+
